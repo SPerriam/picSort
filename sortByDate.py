@@ -64,8 +64,11 @@ def get_exif_value(fullFilePath, exifKey):
     # Open image file for reading (binary mode)
     file = open(fullFilePath, 'rb')
     tags = exifread.process_file(file, details=False, stop_tag=exifKey.split(" ")[1])
+    exifKeyalt = exifKey.replace('EXIF', 'Image')
     if exifKey in tags:
         return (tags[exifKey])
+    elif exifKeyalt in tags:
+        return (tags[exifKeyalt])
     else:
         return "TagNotFound"
 
