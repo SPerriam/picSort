@@ -107,21 +107,22 @@ if not os.path.exists(undatedDir):
 '''collect file attributes for each of the files (path)'''
 for fullFilePath in filePaths:
     fullFilePath = fullFilePath.rstrip('\n')
-    fullFileType = get_filetype(fullFilePath)
-    dateOriginal = "NA"
-    dateDigitized = "NA"
-    if fullFileType != 'notImage':
-        if get_exif_value(fullFilePath, 'EXIF DateTimeOriginal') != "TagNotFound":
-            dated = datetime.datetime.strptime(str(get_exif_value(fullFilePath, 'EXIF DateTimeOriginal')), '%Y:%m:%d %H:%M:%S')
-            #if not dated:
-            #    dated = datetime.datetime.strptime(str(get_exif_value(fullFilePath, 'EXIF DateTimeDigitized')), '%Y:%m:%d %H:%M:%S')
+    if os.path.isfile(fullFilePath):
+        fullFileType = get_filetype(fullFilePath)
+        dateOriginal = "NA"
+        dateDigitized = "NA"
+        if fullFileType != 'notImage':
+            if get_exif_value(fullFilePath, 'EXIF DateTimeOriginal') != "TagNotFound":
+                dated = datetime.datetime.strptime(str(get_exif_value(fullFilePath, 'EXIF DateTimeOriginal')), '%Y:%m:%d %H:%M:%S')
+                #if not dated:
+                #    dated = datetime.datetime.strptime(str(get_exif_value(fullFilePath, 'EXIF DateTimeDigitized')), '%Y:%m:%d %H:%M:%S')
 
-            '''Create duplicate bin if not there already'''
-            destinationDir = os.path.join(args.destination,  str(dated.year), str(dated.month).zfill(2), str(dated.day).zfill(2))
-            if not os.path.exists(destinationDir):
-                os.makedirs(destinationDir)
-            shutil.copy(fullFilePath, destinationDir)
+                '''Create duplicate bin if not there already'''
+                destinationDir = os.path.join(args.destination,  str(dated.year), str(dated.month).zfill(2), str(dated.day).zfill(2))
+                if not os.path.exists(destinationDir):
+                    os.makedirs(destinationDir)
+                shutil.copy(fullFilePath, destinationDir)
 
-        else:
-            '''copy to 'undated' folder'''
-            shutil.copy(fullFilePath, undatedDir)
+            else:
+                '''copy to 'undated' folder'''
+                shutil.copy(fullFilePath, undatedDir)
