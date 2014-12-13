@@ -26,6 +26,7 @@ def argparse():
     parser = argparse.ArgumentParser(description='Uploads Expression Analysis data to Experiment model and its pals.')
     parser.add_argument('--basepath',  required=True, help='Base path for the parent directory which contains all the pictures.\n')
     parser.add_argument('--destination',  required=True, help='Base path for the directory to place sorted files\n')
+    parser.add_argument('--filelist',  required=False, help='File containing the full paths for all the files to be sorted.\n')
     parser.add_argument('--debug', required=False, default=False, type=bool)
     parser.add_argument('--version', '-v',  action='version', version='%(prog)s 1.0')
     args = parser.parse_args()
@@ -78,12 +79,22 @@ def get_exif_value(fullFilePath, exifKey):
 #
 ####################################################################
 
-'''create a lits of absolute paths for all the file under a base directory'''
+'''
+create a lits of absolute paths for all the file under a base directory.
+read it from the supplied file list else generate one from basepath.
+'''
 filePaths = []
-for (dirpath, dirnames, filenames) in walk(basepath):
-    for filename in filenames:
-        fullFilePath = os.path.join(dirpath, filename)
-        filePaths.append(fullFilePath)
+if args.filelist:
+    with open(args.filelist) as f:
+        filePaths = f.readlines()
+else:
+    for (dirpath, dirnames, filenames) in walk(basepath):
+        for filename in filenames:
+            fullFilePath = os.path.join(dirpath, filename)
+            filePaths.append(fullFilePath)
+
+
+#print(filePaths)
 
 data = defaultdict(dict)
 
@@ -95,6 +106,7 @@ if not os.path.exists(undatedDir):
 
 '''collect file attributes for each of the files (path)'''
 for fullFilePath in filePaths:
+    fullFilePath = fullFilePath.rstrip('\n')
     fullFileType = get_filetype(fullFilePath)
     dateOriginal = "NA"
     dateDigitized = "NA"
